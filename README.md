@@ -133,18 +133,6 @@ Add this line (adjust paths as needed):
 | `EMAIL_FROM` | Sender email address — must be a verified sender in Brevo |
 | `EMAIL_SUBJECT` | Subject line for notification emails |
 
-### SMTP / msmtp Settings
-
-| Variable | Description |
-[2026-02-23 09:00:02] [INFO]   Old (stored CURRENT_IP): 198.51.100.7
-[2026-02-23 09:00:02] [INFO]   New (detected):          203.0.113.42
-[2026-02-23 09:00:02] [INFO] Updating OLD_IP to: 198.51.100.7
-[2026-02-23 09:00:02] [INFO] Updating CURRENT_IP to: 203.0.113.42
-[2026-02-23 09:00:02] [INFO] Sending email notification...
-[2026-02-23 09:00:03] [INFO] Email notification sent to your-email@example.com
-[2026-02-23 09:00:03] [INFO] IP change handled successfully.
-```
-
 ---
 
 ## Requirements

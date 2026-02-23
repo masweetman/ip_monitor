@@ -1,0 +1,60 @@
+# ============================================================
+# ip_monitor.conf - Configuration file for ip_monitor.sh
+# ============================================================
+
+# --- IP Address Tracking ---
+# The last known "old" IP address (previous change baseline)
+OLD_IP=""
+
+# The most recently confirmed current IP address
+CURRENT_IP=""
+
+# --- Email Notification Settings ---
+# Recipient email address
+EMAIL_TO="your-email@example.com"
+
+# Sender display name (shown in the From: header)
+EMAIL_FROM_NAME="IP Monitor"
+
+# Sender email address (must match your SMTP account's verified sender)
+EMAIL_FROM="your-sender@example.com"
+
+# Email subject line
+EMAIL_SUBJECT="[IP Monitor] Public IP Address Changed"
+
+# --- SMTP / msmtp Settings (Brevo) ---
+# SMTP server hostname
+SMTP_HOST="smtp-relay.brevo.com"
+
+# SMTP port (587 = STARTTLS, 465 = TLS/SSL)
+SMTP_PORT=587
+
+# SMTP login username (for Brevo: your account email address)
+SMTP_USER="your-brevo-account@example.com"
+
+# SMTP password (for Brevo: your SMTP key from Settings > SMTP & API)
+SMTP_PASSWORD="your-brevo-smtp-key"
+
+# Use TLS (on/off) — should be "on" for port 587 (STARTTLS) or 465 (SSL)
+SMTP_TLS="on"
+
+# Path to CA certificates bundle for TLS verification
+SMTP_TLS_TRUST_FILE="/etc/ssl/certs/ca-certificates.crt"
+
+# Path to msmtp log file (leave empty to disable msmtp logging)
+MSMTP_LOG_FILE="/var/log/msmtp.log"
+
+# --- IP Detection ---
+# Service used to detect the public IP address
+# Options: https://api.ipify.org  |  https://ifconfig.me  |  https://icanhazip.com
+IP_SERVICE="https://api.ipify.org"
+
+# Timeout in seconds for the IP detection curl request
+CURL_TIMEOUT=10
+
+# --- Logging ---
+# Path to the log file (leave empty to disable logging)
+LOG_FILE="/var/log/ip_monitor.log"
+
+# Maximum log file size in bytes before rotation (default: 1MB)
+LOG_MAX_SIZE=1048576

@@ -1,0 +1,13 @@
+# Configuration files (may contain sensitive data)
+*.conf
+
+# Shell script related
+*.log
+*.pid
+*.tmp
+*.bak
+*.swp
+*~
+
+# macOS
+.DS_Store

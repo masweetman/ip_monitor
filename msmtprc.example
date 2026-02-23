@@ -1,0 +1,44 @@
+# ============================================================
+# msmtprc.example - msmtp configuration reference (Brevo)
+# ============================================================
+# NOTE: You do NOT need this file to use ip_monitor.sh.
+#
+# ip_monitor.sh builds a temporary msmtp config automatically
+# from the SMTP_* variables in ip_monitor.conf. No separate
+# ~/.msmtprc file is required.
+#
+# This file is provided as a reference only — for example, if
+# you want to test msmtp manually from the command line before
+# running the script.
+#
+# To use manually:
+#   cp msmtprc.example ~/.msmtprc
+#   chmod 600 ~/.msmtprc
+#   nano ~/.msmtprc   # fill in your credentials
+#   echo "Subject: test" | msmtp your-email@example.com
+# ============================================================
+
+# Default settings applied to all accounts
+defaults
+auth           on
+tls            on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile        ~/.msmtp.log
+
+# --- Brevo (formerly Sendinblue) SMTP Relay ---
+# SMTP credentials are found in your Brevo account under:
+#   Settings > SMTP & API > SMTP tab
+#
+# SMTP Host:  smtp-relay.brevo.com
+# SMTP Port:  587 (STARTTLS) or 465 (SSL)
+# Login:      your Brevo account email address
+# Password:   your Brevo SMTP key (NOT your account password)
+account        brevo
+host           smtp-relay.brevo.com
+port           587
+from           your-verified-sender@example.com
+user           your-brevo-account@example.com
+password       your-brevo-smtp-key
+
+# Set the default account
+account default : brevo

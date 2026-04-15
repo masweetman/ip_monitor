@@ -111,6 +111,16 @@ validate_config() {
         log ERROR "Please update $CONFIG_FILE before running this script."
         exit 1
     fi
+
+    if [[ -z "${CF_API_TOKEN:-}" || "$CF_API_TOKEN" == "your-cloudflare-api-token" ]]; then
+        log ERROR "CF_API_TOKEN is not configured in $CONFIG_FILE"
+        (( errors++ )) || true
+    fi
+
+    if [[ ${#CF_RECORDS[@]} -eq 0 ]]; then
+        log ERROR "CF_RECORDS array is empty in $CONFIG_FILE"
+        (( errors++ )) || true
+    fi
 }
 
 # ------------------------------------------------------------
@@ -144,6 +154,48 @@ update_config_var() {
 
     # Replace the variable assignment line in the config file
     sed -i "s|^${var_name}=.*|${var_name}=\"${escaped_value}\"|" "$CONFIG_FILE"
+}
+
+# ------------------------------------------------------------
+# Update Cloudflare DNS A records to the new IP address
+# ------------------------------------------------------------
+update_cloudflare_records() {
+  local new_ip="$1"
+  local errors=0
+
+  if ! command -v curl &>/dev/null; then
+    log ERROR "curl is not installed — cannot update Cloudflare DNS records"
+    return 1
+  fi
+
+  for record_entry in "${CF_RECORDS[@]}"; do
+    # Split "zone_id:record_id:record_name" on ':'
+    IFS=':' read -r zone_id record_id record_name <<< "$record_entry"
+
+    if [[ -z "$zone_id" || -z "$record_id" || -z "$record_name" ]]; then
+      log ERROR "Malformed CF_RECORDS entry: '$record_entry' — expected zone_id:record_id:record_name"
+      (( errors++ )) || true
+      continue
+    fi
+
+    log INFO "Updating Cloudflare DNS: $record_name → $new_ip"
+
+    local response
+    response="$(curl --silent --max-time "${CURL_TIMEOUT:-10}" \
+      -X PATCH "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}" \
+      -H "Authorization: Bearer ${CF_API_TOKEN}" \
+      -H "Content-Type: application/json" \
+      --data "{\"type\":\"A\",\"content\":\"${new_ip}\"}")"
+
+    if echo "$response" | grep -q '"success":true'; then
+      log INFO "Cloudflare DNS updated successfully: $record_name"
+    else
+      log ERROR "Cloudflare DNS update failed for $record_name — API response: $response"
+      (( errors++ )) || true
+    fi
+  done
+
+  return $errors
 }
 
 # ------------------------------------------------------------
@@ -283,12 +335,24 @@ main() {
 
     # 3. Send email notification
     log INFO "Sending email notification..."
-    if send_email "$stored_ip" "$detected_ip"; then
-        log INFO "IP change handled successfully."
-    else
+    local overall_status=0
+    if ! send_email "$stored_ip" "$detected_ip"; then
         log ERROR "Email notification failed, but config file has been updated."
-        exit 1
+        overall_status=1
     fi
+
+    # 4. Update Cloudflare DNS records
+    log INFO "Updating Cloudflare DNS records..."
+    if ! update_cloudflare_records "$detected_ip"; then
+        log ERROR "One or more Cloudflare DNS updates failed."
+        overall_status=1
+    fi
+
+    if [[ $overall_status -eq 0 ]]; then
+        log INFO "IP change handled successfully."
+    fi
+
+    exit $overall_status
 }
 
 main "$@"

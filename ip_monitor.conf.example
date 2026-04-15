@@ -9,6 +9,17 @@ OLD_IP=""
 # The most recently confirmed current IP address
 CURRENT_IP=""
 
+# --- Cloudflare DNS Update Settings ---
+# Cloudflare API token (needs DNS Edit permission for the relevant zones)
+CF_API_TOKEN="your-cloudflare-api-token"
+
+# DNS A records to update on IP change
+# Format: "zone_id:record_id:record_name" (record_name is for logging only)
+CF_RECORDS=(
+  "your_zone_id_1:your_record_id_1:subdomain.example.com"
+  "your_zone_id_2:your_record_id_2:other.example.com"
+)
+
 # --- Email Notification Settings ---
 # Recipient email address
 EMAIL_TO="your-email@example.com"
